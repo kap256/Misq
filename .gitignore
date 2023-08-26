@@ -211,3 +211,4 @@ GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
 /MSTest/Token_Secret.cs
+/MSTest/TestData_Secret.cs

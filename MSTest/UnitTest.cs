@@ -3,9 +3,12 @@ namespace MSTest
     [TestClass]
     public class UnitTest
     {
+        static TestContext Context;
+
         [ClassInitialize]
         public static void ClassInitialize(TestContext t)
         {
+            Context = t;
         }
 
         /// <summary>
@@ -17,46 +20,57 @@ namespace MSTest
         /// 　https://misskey-hub.net/docs/api
         /// </summary>
         [TestMethod]
-        public void Usage()
+        [Ignore]
+        public async Task Usage()
         {
-            async Task AsyncFunc(){
-                // Create your app instance
-                var app = new Misq.App(
-                    TestData.Host(),
-                    TestData.SecretKey());
+            // Create your app instance
+            var app = new Misq.App(
+                TestData.Host(),
+                TestData.SecretKey());
 
-                // Authorize user
-                var user = await app.Authorize();
+            // Authorize user
+            var user = await app.Authorize();
 
-                // Let's post a message to Misskey
-                await user.Request(
-                    "notes/create",
-                    new Dictionary<string, object> {
+            // Let's post a message to Misskey
+            await user.Request(
+                "notes/create",
+                new Dictionary<string, object> {
                     { "text", "yee haw!" }
-                });
-            };
-
-            var task = AsyncFunc();
-            task.Wait();
+            });
         }
+
+        /// <summary>
+        /// 基本の接続
+        /// </summary>
         [TestMethod]
-        public void AccessToken()
+        public async Task Ping()
         {
-            async Task AsyncFunc()
-            {
-                // Authorize user
-                var user = new Misq.Me(TestData.Host(), TestData.AccessToken());
+            var user = new Misq.Me(TestData.Host(), TestData.AccessToken());
 
-                // Let's post a message to Misskey
-                await user.Request(
-                    "notes/create",
-                    new Dictionary<string, object> {
-                    { "text", "yee haw!" }
-                });
-            };
+            var api = new Misq.Wrapper.API(user);
 
-            var task = AsyncFunc();
-            task.Wait();
+            var result = await api.Ping();
+
+            Context.WriteLine(result.ToString());
+            Assert.IsNotNull(result);
+        }
+
+        /// <summary>
+        /// 基本の投稿
+        /// </summary>
+        [TestMethod]
+        public async Task Post()
+        {
+            var user = new Misq.Me(TestData.Host(), TestData.AccessToken());
+
+            var api = new Misq.Wrapper.API(user);
+
+            var result = await api.Note.Create(
+                $"あー、あー。APIのテスト中。只今の時刻は{DateTime.UtcNow}です。",
+                "followers");
+
+            Context.WriteLine(result);
+            Assert.IsNotNull(result);
         }
     }
 }

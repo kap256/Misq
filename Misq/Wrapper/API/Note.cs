@@ -30,7 +30,7 @@ namespace Misq.Wrapper
             var param = other_option ?? new();
             param.Add("text", text);
             param.Add("visibility", visibility);
-            if (fileIds != null) {
+            if (fileIds != null && fileIds.Count()>0) {
                 param.Add("fileIds", fileIds);
             }
 
